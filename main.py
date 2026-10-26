@@ -1,5 +1,6 @@
 import requests as rq
 import sqlite3 as sql
+import matplotlib.pyplot as plt
 
 conn = sql.connect("data/meteo_data.db")
 cursor = conn.cursor()
@@ -21,6 +22,12 @@ params = {
     "latitude": "46.35",
     "longitude": "-72.55",
     "current": "temperature_2m,wind_speed_10m,is_day,rain,snowfall,cloud_cover",
+    "timezone": "auto"
+}
+params_hourly = {
+    "latitude": "46.35",
+    "longitude": "-72.55",
+    "hourly": "temperature_2m,wind_speed_10m,rain,snowfall,cloud_cover",
     "timezone": "auto"
 }
 green = "\033[92m"
@@ -79,14 +86,23 @@ except Exception as e:
 
     
 
-def insert_data(data):
+def hourly_plot():
     try:
-        cursor.execute("""
-        INSERT INTO meteo_data (temperature, wind_speed, day_night, timestamp, rain, snowfall, cloud_cover)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (data["temperature"], data["wind_speed"], data["day_night"], data["timestamp"], data["rain"], data["snowfall"], data["cloud_cover"]))
-        conn.commit()
-    except sql.Error as e:
-        print(f"Database error: {e}")
+        response = rq.get(url, params=params_hourly, timeout=5)
+        response.raise_for_status
+        data = response.json()["hourly"]
+        timestamp = data["time"]
+        rain = data["rain"]
+        snowfall = data["snowfall"]
+        cloud_cover = data["cloud_cover"]
+        temperature = data["temperature_2m"] 
+        wind_speed = data["wind_speed_10m"]
+        plt.plot(timestamp, wind_speed)
+        plt.xticks(range(0,len(timestamp), 24), [t[5:10] for t in timestamp[::24]], rotation=45)
+        plt.show()
+    except rq.exceptions.RequestException as e:
+        print(f"rquest error {e}")
+    except KeyError as e:
+        print(f"key error {e}")
 
-conn.close()
+hourly_plot()
