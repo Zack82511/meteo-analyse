@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 url = "https://api.open-meteo.com/v1/forecast"
-params = {
+params_current = {
     "latitude": "46.35",
     "longitude": "-72.55",
     "current": "temperature_2m,wind_speed_10m,is_day,rain,snowfall,cloud_cover",
@@ -19,9 +19,9 @@ params_hourly = {
 }
 green = "\033[92m"
 reset = "\033[0m"
-def meteo():
+def meteo(paramètres = params_current):
     try:
-        response = rq.get(url, params=params, timeout=5) 
+        response = rq.get(url, params=paramètres, timeout=5) 
         response.raise_for_status()
         data = response.json()["current"] # Extract the current weather data
         temperature = data["temperature_2m"] 
@@ -73,9 +73,9 @@ except Exception as e:
 
     
 
-def hourly_plot():
+def meteo_hourly(parammètres = params_hourly):
     try:
-        response = rq.get(url, params=params_hourly, timeout=5)
+        response = rq.get(url, params=parammètres, timeout=5)
         response.raise_for_status
         data = response.json()["hourly"]
         timestamp = data["time"]
@@ -92,4 +92,3 @@ def hourly_plot():
     except KeyError as e:
         print(f"key error {e}")
 
-hourly_plot()
