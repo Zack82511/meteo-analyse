@@ -2,20 +2,7 @@ import requests as rq
 import sqlite3 as sql
 import matplotlib.pyplot as plt
 
-conn = sql.connect("data/meteo_data.db")
-cursor = conn.cursor()
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS meteo_data (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    temperature REAL,
-    wind_speed REAL,
-    day_night TEXT,
-    timestamp TEXT,
-    rain REAL,
-    snowfall REAL,
-    cloud_cover REAL
-)""")
-conn.commit()
+
 
 url = "https://api.open-meteo.com/v1/forecast"
 params = {
